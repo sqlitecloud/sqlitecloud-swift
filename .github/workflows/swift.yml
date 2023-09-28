@@ -26,4 +26,5 @@ jobs:
         SQ_LITE_CLOUD_HOST: ${{ secrets.SQ_LITE_CLOUD_HOST }}
         SQ_LITE_CLOUD_PASS: ${{ secrets.SQ_LITE_CLOUD_PASS }}
         SQ_LITE_CLOUD_USER: ${{ secrets.SQ_LITE_CLOUD_USER }}
-      run: swift test -v
+      run: |
+        swift test -v "$SQ_LITE_CLOUD_HOST" "$SQ_LITE_CLOUD_PASS" "$SQ_LITE_CLOUD_USER"

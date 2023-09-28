@@ -22,4 +22,8 @@ jobs:
     - name: Build
       run: swift build -v
     - name: Run tests
+      env:
+        SQ_LITE_CLOUD_HOST: ${{ secrets.SQ_LITE_CLOUD_HOST }}
+        SQ_LITE_CLOUD_PASS: ${{ secrets.SQ_LITE_CLOUD_PASS }}
+        SQ_LITE_CLOUD_USER: ${{ secrets.SQ_LITE_CLOUD_USER }}
       run: swift test -v

@@ -38,7 +38,7 @@ jobs:
     - name: Setup Xcode
       uses: maxim-lobanov/setup-xcode@v1.4.0
       with:
-        xcode-version: latest-stable
+        xcode-version: "15.0"
 
     - name: Gather code coverage
       run: xcrun llvm-cov export -format="lcov" .build/debug/SQLiteCloudPackageTests.xctest/Contents/MacOS/SQLiteCloudPackageTests -instr-profile .build/debug/codecov/default.profdata > coverage_report.lcov

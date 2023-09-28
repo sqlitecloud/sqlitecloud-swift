@@ -13,9 +13,6 @@ let package = Package(
             name: "SQLiteCloud",
             targets: ["SQLiteCloud"]),
     ],
-    dependencies: [
-        .package(url: "https://github.com/realm/SwiftLint", from: "0.52.4")
-    ],
     targets: [
         .target(
             name: "SQLiteCloud",
@@ -24,9 +21,6 @@ let package = Package(
             ], 
             swiftSettings: [
                 .enableExperimentalFeature("StrictConcurrency")
-            ],
-            plugins: [
-                .plugin(name: "SwiftLintPlugin", package: "SwiftLint")
             ]
         ),
         .target(

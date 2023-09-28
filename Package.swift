@@ -37,7 +37,11 @@ let package = Package(
         ),
         .testTarget(
             name: "SQLiteCloudTests",
-            dependencies: ["SQLiteCloud"]
+            dependencies: ["SQLiteCloud"],
+            exclude: ["Secrets/secrets.json.sample"],
+            resources: [
+                .copy("Secrets/secrets.json")
+            ]
         ),
     ]
 )

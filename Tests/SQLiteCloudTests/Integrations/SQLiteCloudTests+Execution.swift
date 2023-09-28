@@ -32,9 +32,10 @@ final class SQLiteCloudTests_Execute: XCTestCase {
     private var password: String = .empty
     
     override func setUpWithError() throws {
-        hostname = ProcessInfo.processInfo.environment["SQ_LITE_CLOUD_HOST"] ?? .empty
-        username = ProcessInfo.processInfo.environment["SQ_LITE_CLOUD_USER"] ?? .empty
-        password = ProcessInfo.processInfo.environment["SQ_LITE_CLOUD_PASS"] ?? .empty
+        let secrets = try Secrets.load()
+        hostname = secrets.hostname
+        username = secrets.username
+        password = secrets.password
     }
     
     func test_execute_withValidConnection_shouldReturnValidResult() async throws {

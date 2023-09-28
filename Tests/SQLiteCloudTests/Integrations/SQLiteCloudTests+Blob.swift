@@ -36,9 +36,10 @@ final class SQLiteCloudTests_Blob: XCTestCase {
     private var firstRandomData: Data = .empty
     
     override func setUp() async throws {
-        hostname = ProcessInfo.processInfo.environment["SQ_LITE_CLOUD_HOST"] ?? .empty
-        username = ProcessInfo.processInfo.environment["SQ_LITE_CLOUD_USER"] ?? .empty
-        password = ProcessInfo.processInfo.environment["SQ_LITE_CLOUD_PASS"] ?? .empty
+        let secrets = try Secrets.load()
+        hostname = secrets.hostname
+        username = secrets.username
+        password = secrets.password
         
         let config = SQLiteCloudConfig(hostname: hostname, username: username, password: password)
         cloud = SQLiteCloud(config: config)

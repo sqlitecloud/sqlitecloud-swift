@@ -10,21 +10,32 @@ on:
     branches: [ "main" ]
 
 jobs:
-  build:
-
+  
+  swiftlint:
     runs-on: macos-latest
 
     steps:
     - uses: actions/checkout@v4
+    - name: Lint code using SwiftLint
+      run: swiftlint lint --reporter github-actions-logging
+      
+  build:
+    runs-on: macos-latest
+
+    steps:
+    
+    - uses: actions/checkout@v4
     - uses: swift-actions/setup-swift@v1
       with:
         swift-version: "5.8.1"
+        
     - name: Build
       run: swift build -v
+    
     - name: Run tests
       env:
         SQ_LITE_CLOUD_HOST: ${{ secrets.SQ_LITE_CLOUD_HOST }}
         SQ_LITE_CLOUD_PASS: ${{ secrets.SQ_LITE_CLOUD_PASS }}
         SQ_LITE_CLOUD_USER: ${{ secrets.SQ_LITE_CLOUD_USER }}
       run: |
-        swift test -v SQ_LITE_CLOUD_HOST="$SQ_LITE_CLOUD_HOST" SQ_LITE_CLOUD_PASS="$SQ_LITE_CLOUD_PASS" SQ_LITE_CLOUD_USER="$SQ_LITE_CLOUD_USER"
+        run: swift test --enable-code-coverage -v

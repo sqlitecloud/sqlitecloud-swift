@@ -21,7 +21,7 @@ You can install SQLiteCloud Swift Package using Swift Package Manager (SPM). Add
 
 ```swift
 dependencies: [
-    .package(url: "https://github.com/sqlitecloud/swift", from: "0.1.0")
+    .package(url: "https://github.com/sqlitecloud/swift", from: "0.2.0")
 ]
 ```
 

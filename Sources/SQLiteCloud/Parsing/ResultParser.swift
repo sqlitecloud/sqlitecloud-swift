@@ -33,32 +33,32 @@ enum ResultParser {
         switch resulType {
         case RESULT_OK:
             return .success
-                   
+            
         case RESULT_ERROR:
             throw SQLiteCloudError.handleError(connection: connection)
-                   
+            
         case RESULT_NULL:
             return .value(.null)
-
+            
         case RESULT_STRING:
             if SQCloudResultLen(result) != 0 {
                 let text = String(format: "%.*s", SQCloudResultLen(result), SQCloudResultBuffer(result))
                 return .value(.string(text))
             }
-
+            
             return .value(.string(.empty))
-                   
+            
         case RESULT_JSON:
             if SQCloudResultLen(result) > 0 {
                 let text = String(format: "%.*s", SQCloudResultLen(result), SQCloudResultBuffer(result))
                 return .json(text)
             }
             return .json(.empty)
-        
+            
         case RESULT_INTEGER:
             let value = SQCloudResultInt64(result)
             return .value(.integer(Int(value)))
-               
+            
         case RESULT_FLOAT:
             let value = SQCloudResultDouble(result)
             return .value(.double(value))
@@ -66,11 +66,11 @@ enum ResultParser {
         case RESULT_ARRAY:
             let array = try parse(array: result)
             return .array(array)
-                   
+            
         case RESULT_ROWSET:
             let rowset = try parse(rowset: result)
             return .rowset(rowset)
-                   
+            
         case RESULT_BLOB:
             if SQCloudResultLen(result) > 0 {
                 if let buffer = SQCloudResultBuffer(result) {
@@ -94,7 +94,7 @@ enum ResultParser {
         
         let nrows = SQCloudRowsetRows(rowset)
         let ncols = SQCloudRowsetCols(rowset)
-
+        
         let columns = (0..<ncols).map { index -> String in
             var len: Int32 = 0
             if let value = SQCloudRowsetColumnName(rowset, index, &len) {
@@ -116,14 +116,14 @@ enum ResultParser {
                 case VALUE_FLOAT:
                     let value = SQCloudRowsetDoubleValue(rowset, rowIndex, columnIndex)
                     return .double(value)
-
+                    
                 case VALUE_TEXT:
                     var len: Int32 = 0
                     if let value = SQCloudRowsetValue(rowset, rowIndex, columnIndex, &len) {
                         return .string(String(format: "%.*s", len, value))
                     }
                     return .string(.empty)
-                        
+                    
                 case VALUE_BLOB:
                     var len: Int32 = 0
                     if let value = SQCloudRowsetValue(rowset, rowIndex, columnIndex, &len) {
@@ -162,14 +162,14 @@ enum ResultParser {
             case VALUE_FLOAT:
                 let value = SQCloudArrayDoubleValue(array, index)
                 return .double(value)
-
+                
             case VALUE_TEXT:
                 var len: Int32 = 0
                 if let value = SQCloudArrayValue(array, index, &len) {
                     return .string(String(format: "%.*s", len, value))
                 }
                 return .string(.empty)
-                    
+                
             case VALUE_BLOB:
                 var len: Int32 = 0
                 if let value = SQCloudArrayValue(array, index, &len) {

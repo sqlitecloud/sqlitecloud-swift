@@ -49,6 +49,11 @@ public enum SQLiteCloudError: Error, Sendable {
     /// An indication that a upload or download task error has occurred.
     /// More detailt can be found in the associated value `SQLiteCloudError.TaskError`
     case taskError(SQLiteCloudError.TaskError)
+
+    /// An indication that the virtual machine has failed.
+    /// The reasons can be of various types.
+    /// More details can be found in the associated value `SQLiteCloudError.VMContext`.
+    case virtualMachineFailure(SQLiteCloudError.VMContext)
 }
 
 public extension SQLiteCloudError {
@@ -87,6 +92,15 @@ public extension SQLiteCloudError {
 
     /// The context in which the task error occurred.
     struct TaskError: Sendable {
+        /// The error code.
+        public let code: Int
+
+        /// The errore message.
+        public let message: String
+    }
+
+    /// The context in which the virtual machine error occurred.
+    struct VMContext: Sendable {
         /// The error code.
         public let code: Int
 

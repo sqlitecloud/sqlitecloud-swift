@@ -39,9 +39,15 @@ extension SQLiteCloudError.ExecutionContext {
 extension SQLiteCloudError.TaskError {
     static let urlHandlerFailed = SQLiteCloudError.TaskError(code: -5, message: "Cannot create URL Handler")
     static let cannotCreateOutputFile = SQLiteCloudError.TaskError(code: -6, message: "Cannot create output file")
-    static let invalidNumberOfRows = SQLiteCloudError.TaskError(code: -6, message: "Invalid number of rows.")
-    static let invalidBlobSizeRead = SQLiteCloudError.TaskError(code: -7, message: "Invalid blob size read.")
-    static let errorWritingBlob = SQLiteCloudError.TaskError(code: -8, message: "Error writing blob.")
+    static let invalidNumberOfRows = SQLiteCloudError.TaskError(code: -7, message: "Invalid number of rows.")
+    static let invalidBlobSizeRead = SQLiteCloudError.TaskError(code: -8, message: "Invalid blob size read.")
+    static let errorWritingBlob = SQLiteCloudError.TaskError(code: -9, message: "Error writing blob.")
+}
+
+extension SQLiteCloudError.VMContext {
+    static func invalidParameterIndex(index: Int) -> SQLiteCloudError.VMContext {
+        SQLiteCloudError.VMContext(code: -10, message: "Invalid parameter index [\(index)].")
+    }
 }
 
 extension SQLiteCloudError {
@@ -62,5 +68,13 @@ extension SQLiteCloudError {
         }
         
         return SQLiteCloudError.unhandledError
+    }
+
+    static func handleVMError(vm: OpaquePointer?) -> SQLiteCloudError {
+        let code = Int(SQCloudVMErrorCode(vm))
+        let message = String(SQCloudVMErrorMsg(vm))
+
+        let context = SQLiteCloudError.VMContext(code: code, message: message)
+        return SQLiteCloudError.virtualMachineFailure(context)
     }
 }

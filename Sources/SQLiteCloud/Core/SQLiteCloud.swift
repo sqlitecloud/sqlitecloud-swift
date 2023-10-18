@@ -51,7 +51,7 @@ import Darwin
 /// - SeeAlso: `SQLiteCloudConfig` for configuring the SQLite Cloud connection.
 /// - SeeAlso: `SQLiteCloudCommand` for representing SQL commands and queries.
 /// - SeeAlso: `SQLiteCloudResult` for representing the result of database operations.
-public final actor SQLiteCloud {
+public final actor SQLiteCloud: SQLiteCloudProvider {
     /// The sqlcloud connection opaque pointer.
     ///
     /// This property represents an opaque pointer to the SQLite Cloud connection.
@@ -1142,5 +1142,53 @@ public extension SQLiteCloud {
             // logging
             logDebug(category: "BLOB", message: "🗃️ Blob writing successful - rowId \(row.rowId) - bytes: \(dataBytesCount)")
         }
+    }
+}
+
+// MARK: - VM API
+
+public extension SQLiteCloud {
+    /// Compiles an SQL query into a byte-code virtual machine (VM). This method creates a 
+    /// `SQLiteCloudVM` instance that you can use to execute the compiled SQL statement.
+    ///
+    /// - Parameters:
+    ///   - query: The SQL query to compile.
+    ///
+    /// - Throws:
+    ///   - `SQLiteCloudError.connectionFailure`: If the connection to the SQLite Cloud 
+    ///     backend has failed. More details can be found in the associated value
+    ///     `SQLiteCloudError.ConnectionContext`.
+    ///
+    ///   - `SQLiteCloudError.handleError`: If an error occurs while handling the SQLite 
+    ///     Cloud operation.
+    ///
+    /// - Returns:
+    ///   A `SQLiteCloudVM` instance representing the compiled virtual machine for the SQL
+    ///    query. You can use this VM to execute the SQL statement.
+    ///
+    ///  Example usage:
+    ///  
+    ///  ```swift
+    ///  let query = "SELECT * FROM your_table"
+    ///  let vm = try await sqliteCloud.compile(query: query)
+    ///  try await vm.step()
+    ///  ```
+    func compile(query: String) async throws -> SQLiteCloudVM {
+        // Checks if connection is open and valid.
+        let conn = try getConnection()
+
+        // Compile an SQL statement into a byte-code virtual machine. 
+        // This function resembles the sqlite3_prepare SQLite API.
+        let vm = SQCloudVMCompile(conn, query, -1, nil)
+        
+        // Checks if compile is failed.
+        guard let vm = vm else {
+            let error =  SQLiteCloudError.handleError(connection: conn)
+            logError(category: "VIRTUAL MACHINE", message: "🚨 VM compile failed: \(error)")
+            throw error
+        }
+
+        logInfo(category: "VIRTUAL MACHINE", message: "🚀 '\(query)' virtual machine created succesfully")
+        return SQLiteCloudVM(vm: vm)
     }
 }

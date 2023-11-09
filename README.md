@@ -21,8 +21,38 @@ You can install SQLiteCloud Swift Package using Swift Package Manager (SPM). Add
 
 ```swift
 dependencies: [
-    .package(url: "https://github.com/sqlitecloud/swift", from: "0.2.0")
+    .package(url: "https://github.com/sqlitecloud/swift", from: "0.1.0")
 ]
+```
+
+## Usage
+
+#### Using explicit configuration
+
+```
+let configuration = SQLiteCloudConfig(host: "myproject.sqlite.cloud", username: "", password: "", port: .default)
+let sqliteCloud = SQLiteCloud(configuration)
+
+do {
+	try await sqliteCloud.connect()
+	debugPrint("connected")
+} catch {
+	debugPrint("connection error: \(error)") // SQLiteCloudConnectionError
+}
+```
+
+#### Using string configuration
+
+```
+let configuration = SQLiteCloudConfig(connectionString: "sqlitecloud://user:pass@host.com:port/dbname?timeout=10&key2=value2&key3=value3")
+let sqliteCloud = SQLiteCloud(configuration)
+
+do {
+	try await sqliteCloud.connect()
+	debugPrint("connected")
+} catch {
+	debugPrint("connection error: \(error)") // SQLiteCloudConnectionError
+}
 ```
 
 ## License

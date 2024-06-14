@@ -1,6 +1,7 @@
 # SQLiteCloud Swift Package
 
-![SQLiteCloud Logo](https://sqlitecloud.io/static/image/c19460c9ed65bc09aea9.png)
+![sqlitecloud-logo](https://github.com/sqlitecloud/sqlitecloud-swift/assets/3525511/700f1817-dd77-46bc-a0a8-21fe505a9029)
+
 
 SQLiteCloud is a powerful Swift package that allows you to interact with the SQLite Cloud backend server seamlessly. It provides methods for various database operations and real-time notifications. This package is designed to simplify database operations in Swift applications, making it easier than ever to work with SQLite Cloud.
 

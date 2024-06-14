@@ -35,7 +35,6 @@ public struct SQLiteCloudConfig: Sendable {
     public let nonlinearizable: Bool
     public let timeout: Int
     public let compression: Bool
-    public let sqliteMode: Bool
     public let zerotext: Bool
     public let memory: Bool
     public let dbCreate: Bool
@@ -59,7 +58,6 @@ public struct SQLiteCloudConfig: Sendable {
                 nonlinearizable: Bool = false,
                 timeout: Int = 0,
                 compression: Bool = false,
-                sqliteMode: Bool = false,
                 zerotext: Bool = false,
                 memory: Bool = false,
                 dbCreate: Bool = false,
@@ -82,7 +80,6 @@ public struct SQLiteCloudConfig: Sendable {
         self.nonlinearizable = nonlinearizable
         self.timeout = timeout
         self.compression = compression
-        self.sqliteMode = sqliteMode
         self.zerotext = zerotext
         self.memory = memory
         self.dbCreate = dbCreate
@@ -130,7 +127,6 @@ public struct SQLiteCloudConfig: Sendable {
         // in query
         self.timeout = UrlParser.parse(items: queryItems, name: "timeout")
         self.compression = UrlParser.parse(items: queryItems, name: "compression")
-        self.sqliteMode = UrlParser.parse(items: queryItems, name: "sqliteMode")
         self.zerotext = UrlParser.parse(items: queryItems, name: "zerotext")
         self.memory = UrlParser.parse(items: queryItems, name: "memory")
         self.dbCreate = UrlParser.parse(items: queryItems, name: "create")

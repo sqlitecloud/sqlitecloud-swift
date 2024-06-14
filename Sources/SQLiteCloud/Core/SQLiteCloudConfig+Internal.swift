@@ -35,10 +35,9 @@ extension SQLiteCloudConfig {
         sqConfig.username = (username as NSString).utf8String
         sqConfig.password = (password as NSString).utf8String
         sqConfig.password_hashed = passwordHashed
-        sqConfig.nonlinearizable = nonlinearizable
+        sqConfig.non_linearizable = nonlinearizable
         sqConfig.timeout = Int32(timeout)
         sqConfig.compression = compression
-        sqConfig.sqlite_mode = sqliteMode
         sqConfig.zero_text = zerotext
         sqConfig.db_memory = memory
         sqConfig.db_create = dbCreate

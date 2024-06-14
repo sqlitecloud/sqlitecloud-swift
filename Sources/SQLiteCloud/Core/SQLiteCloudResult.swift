@@ -25,11 +25,21 @@
 
 import Foundation
 
+/// An enumeration representing the result of a query or operation in SQLiteCloud.
 public enum SQLiteCloudResult: Hashable, Sendable {
+    /// The operation was successful with no specific data.
     case success
+
+    /// A result in JSON format as a string.
     case json(String)
+
+    /// A single value result.
     case value(SQLiteCloudValue)
+
+    /// An array of values as a result.
     case array([SQLiteCloudValue])
+
+    /// A rowset containing columns and rows.
     case rowset(SQLiteCloudRowset)
 }
 

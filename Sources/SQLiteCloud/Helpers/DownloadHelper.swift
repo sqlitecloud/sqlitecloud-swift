@@ -25,12 +25,11 @@
 
 import Foundation
 
-class DownloadHelper {
+final class DownloadHelper {
     let outputStream: OutputStream
     let progressHandler: ProgressHandler
 
     deinit {
-        debugPrint("deinit")
         outputStream.close()
     }
 

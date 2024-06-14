@@ -25,11 +25,24 @@
 
 import Foundation
 
-public enum SQLiteCloudValueType: Int {
+/// An enumeration representing the value types used in SQLiteCloud for database values.
+public enum SQLiteCloudValueType: Int, Sendable {
+    /// An integer value.
     case integer = 1
+    
+    /// A floating-point (double) value.
     case float = 2
+    
+    /// A text (string) value.
     case text = 3
+    
+    /// A binary large object (blob) value.
     case blob = 4
+    
+    /// A null value.
     case null = 5
+    
+    /// An unknown or unsupported value type.
     case unknown = -1
 }
+

@@ -60,7 +60,6 @@ final class SQLiteCloudConfigTests: XCTestCase {
                                        nonlinearizable: nonlinearizable,
                                        timeout: timeout,
                                        compression: compression,
-                                       sqliteMode: sqliteMode,
                                        zerotext: zerotext,
                                        memory: memory,
                                        dbCreate: dbCreate,
@@ -82,7 +81,6 @@ final class SQLiteCloudConfigTests: XCTestCase {
         XCTAssertEqual(nonlinearizable, config.nonlinearizable)
         XCTAssertEqual(timeout, config.timeout)
         XCTAssertEqual(compression, config.compression)
-        XCTAssertEqual(sqliteMode, config.sqliteMode)
         XCTAssertEqual(zerotext, config.zerotext)
         XCTAssertEqual(memory, config.memory)
         XCTAssertEqual(dbCreate, config.dbCreate)

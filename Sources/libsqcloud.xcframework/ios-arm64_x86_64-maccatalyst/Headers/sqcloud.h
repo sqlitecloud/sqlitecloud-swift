@@ -15,8 +15,8 @@
 extern "C" {
 #endif
 
-#define SQCLOUD_SDK_VERSION         "0.9.5"
-#define SQCLOUD_SDK_VERSION_NUM     0x000905
+#define SQCLOUD_SDK_VERSION         "0.9.9"
+#define SQCLOUD_SDK_VERSION_NUM     0x000909
 #define SQCLOUD_DEFAULT_PORT        8860
 #define SQCLOUD_DEFAULT_TIMEOUT     12
 #define SQCLOUD_DEFAULT_UPLOAD_SIZE 512*1024
@@ -50,6 +50,13 @@ extern "C" {
 #define CMD_ASYNC_STRING            '>'
 #define CMD_ASYNC_ARRAY             '<'
 
+typedef enum {
+    ROWSET_TYPE_BASIC               = 1,
+    ROWSET_TYPE_METADATA_v1         = 2,
+    ROWSET_TYPE_HEADER_ONLY         = 3,
+    ROWSET_TYPE_DATA_ONLY           = 4
+} SQCLOUD_ROWSET_TYPE;
+
 // MARK: -
 
 // opaque datatypes
@@ -67,13 +74,13 @@ typedef struct SQCloudConfigStruct {
     const char      *username;              // connection username
     const char      *password;              // connection password
     const char      *database;              // database to use during connection
+    const char      *api_key;               // APIKEY
     int             timeout;                // connection timeout parameter
     int             family;                 // can be: SQCLOUD_IPv4, SQCLOUD_IPv6 or SQCLOUD_IPANY
     bool            compression;            // compression flag
-    bool            sqlite_mode;            // special sqlite compatibility mode
     bool            zero_text;              // flag to tell the server to zero-terminate strings
     bool            password_hashed;        // private flag
-    bool            nonlinearizable;        // flag to request for immediate responses from the server node without waiting for linerizability guarantees
+    bool            non_linearizable;       // flag to request for immediate responses from the server node without waiting for linerizability guarantees
     bool            db_memory;              // flag to force the database to be in-memory
     bool            no_blob;                // flag to tell the server to not send BLOB columns
     bool            db_create;              // flag to force the creation of the database (if it does not exist)
@@ -85,6 +92,7 @@ typedef struct SQCloudConfigStruct {
     const char      *tls_certificate;
     const char      *tls_certificate_key;
     bool            insecure;               // flag to disable TLS
+    bool            no_verify_certificate;  // flag to accept invalid TLS certificates
     #endif
     config_cb       callback;               // reserved callback for internal usage
     void            *data;                  // reserved callback data parameter
@@ -118,14 +126,6 @@ typedef enum {
 } SQCLOUD_VALUE_TYPE;
 
 typedef enum {
-    SQCLOUD_ROWSET_FLAG_STANDARD = 0,            // rowset contains standard header and data
-    SQCLOUD_ROWSET_FLAG_METACOLS = 1,            // rowset contains additional columns metadata
-    SQCLOUD_ROWSET_FLAG_HEADONLY = 2,            // rowset is header only
-    SQCLOUD_ROWSET_FLAG_DATAONLY = 3,            // rowset is data only
-    SQCLOUD_ROWSET_FLAG_METAVM = 4               // rowset contains VM metadata info
-} SQCLOUD_ROWSET_FLAG;
-
-typedef enum {
     ARRAY_TYPE_SQLITE_EXEC = 10,            // used in SQLITE_MODE only when a write statement is executed (instead of the OK reply)
     ARRAY_TYPE_DB_STATUS = 11,
     ARRAY_TYPE_METADATA = 12,
@@ -153,7 +153,8 @@ typedef enum {
     INTERNAL_ERRCODE_MEMORY = 100004,
     INTERNAL_ERRCODE_NETWORK = 100005,
     INTERNAL_ERRCODE_FORMAT = 100006,
-    INTERNAL_ERRCODE_INDEX = 100007
+    INTERNAL_ERRCODE_INDEX = 100007,
+    INTERNAL_ERRCODE_SOCKCLOSED = 100008,
 } SQCLOUD_INTERNAL_ERRCODE;
 
 // from SQLiteCloud
@@ -211,6 +212,9 @@ char *SQCloudRowsetColumnDeclType (SQCloudResult *result, uint32_t col, uint32_t
 char *SQCloudRowsetColumnDBName (SQCloudResult *result, uint32_t col, uint32_t *len);
 char *SQCloudRowsetColumnTblName (SQCloudResult *result, uint32_t col, uint32_t *len);
 char *SQCloudRowsetColumnOrigName (SQCloudResult *result, uint32_t col, uint32_t *len);
+uint32_t SQCloudRowSetColumnNotNULL (SQCloudResult *result, uint32_t col);
+uint32_t SQCloudRowSetColumnPrimaryKey (SQCloudResult *result, uint32_t col);
+uint32_t SQCloudRowSetColumnAutoIncrement (SQCloudResult *result, uint32_t col);
 uint32_t SQCloudRowsetRows (SQCloudResult *result);
 uint32_t SQCloudRowsetCols (SQCloudResult *result);
 uint32_t SQCloudRowsetMaxLen (SQCloudResult *result);
@@ -222,6 +226,7 @@ float SQCloudRowsetFloatValue (SQCloudResult *result, uint32_t row, uint32_t col
 double SQCloudRowsetDoubleValue (SQCloudResult *result, uint32_t row, uint32_t col);
 void SQCloudRowsetDump (SQCloudResult *result, uint32_t maxline, bool quiet);
 bool SQCloudRowsetCompare (SQCloudResult *result1, SQCloudResult *result2);
+bool SQCloudRowsetCanWrite (SQCloudResult *result);
 
 // MARK: - Array -
 SQCloudResult *SQCloudExecArray (SQCloudConnection *connection, const char *command, const char **values, uint32_t len[], SQCLOUD_VALUE_TYPE types[], uint32_t n);

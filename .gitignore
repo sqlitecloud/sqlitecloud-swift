@@ -91,3 +91,4 @@ iOSInjectionProject/
 
 # Secrets
 secrets.json
+.DS_Store

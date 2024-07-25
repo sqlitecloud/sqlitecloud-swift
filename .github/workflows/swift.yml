@@ -25,7 +25,8 @@ jobs:
         {
             "hostname": "${{ secrets.SQ_LITE_CLOUD_HOST }}",
             "username": "${{ secrets.SQ_LITE_CLOUD_USER }}",
-            "password": "${{ secrets.SQ_LITE_CLOUD_PASS }}"
+            "password": "${{ secrets.SQ_LITE_CLOUD_PASS }}",
+            "apiKey": "${{ secrets.SQ_LITE_CLOUD_APIKEY }}"
         }
         ' >> Tests/SQLiteCloudTests/Secrets/secrets.json
     

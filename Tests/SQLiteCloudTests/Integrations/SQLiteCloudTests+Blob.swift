@@ -30,6 +30,7 @@ final class SQLiteCloudTests_Blob: XCTestCase {
     private var hostname: String = .empty
     private var username: String = .empty
     private var password: String = .empty
+    private var apiKey: String = .empty
     private var cloud: SQLiteCloud!
     
     private var firstLength: Int = 0
@@ -40,8 +41,9 @@ final class SQLiteCloudTests_Blob: XCTestCase {
         hostname = secrets.hostname
         username = secrets.username
         password = secrets.password
-        
-        let config = SQLiteCloudConfig(hostname: hostname, username: username, password: password)
+        apiKey = secrets.apiKey
+
+        let config = SQLiteCloudConfig(hostname: hostname, username: username, password: password, apiKey: apiKey)
         cloud = SQLiteCloud(config: config)
         try await cloud.connect()
         

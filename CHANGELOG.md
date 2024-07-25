@@ -1,5 +1,9 @@
 # Changelog
 
+## v0.2.2 - July 25, 2024
+
+* Added support for apikey parameter in connection string.
+
 ## v0.2.0 - October 18, 2023
 
 * Introduced the `SQLiteCloudVM` class, a virtual machine for executing SQL commands. Provided methods to bind values, step through the execution, and retrieve query results. 

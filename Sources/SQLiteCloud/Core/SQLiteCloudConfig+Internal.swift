@@ -32,8 +32,14 @@ extension SQLiteCloudConfig {
     var sqConfig: SQCloudConfig {
         var sqConfig = SQCloudConfig()
         sqConfig.family = family.rawValue
-        sqConfig.username = (username as NSString).utf8String
-        sqConfig.password = (password as NSString).utf8String
+        if let username, 
+           let password {
+            sqConfig.username = (username as NSString).utf8String
+            sqConfig.password = (password as NSString).utf8String
+        }
+        if let apiKey {
+            sqConfig.api_key = (apiKey as NSString).utf8String
+        }
         sqConfig.password_hashed = passwordHashed
         sqConfig.non_linearizable = nonlinearizable
         sqConfig.timeout = Int32(timeout)

@@ -28,8 +28,9 @@ import Foundation
 public struct SQLiteCloudConfig: Sendable {
     public let hostname: String
     public let port: Port
-    public let username: String
-    public let password: String
+    public let username: String?
+    public let password: String?
+    public let apiKey: String?
     public let family: Family
     public let passwordHashed: Bool
     public let nonlinearizable: Bool
@@ -50,8 +51,102 @@ public struct SQLiteCloudConfig: Sendable {
     public let clientCertificateKey: String?
     
     public init(hostname: String,
+                apiKey: String,
+                port: Port = .default,
+                family: Family = .ipv4,
+                passwordHashed: Bool = false,
+                nonlinearizable: Bool = false,
+                timeout: Int = 0,
+                compression: Bool = false,
+                zerotext: Bool = false,
+                memory: Bool = false,
+                dbCreate: Bool = false,
+                insecure: Bool = false,
+                noblob: Bool = false,
+                isReadonlyConnection: Bool = false,
+                maxData: Int = 0,
+                maxRows: Int = 0,
+                maxRowset: Int = 0,
+                dbname: String? = nil,
+                rootCertificate: String? = nil,
+                clientCertificate: String? = nil,
+                clientCertificateKey: String? = nil) {
+        self.init(hostname: hostname,
+                  username: nil,
+                  password: nil,
+                  apiKey: apiKey,
+                  port: port,
+                  family: family,
+                  passwordHashed: passwordHashed,
+                  nonlinearizable: nonlinearizable,
+                  timeout: timeout,
+                  compression: compression,
+                  zerotext: zerotext,
+                  memory: memory,
+                  dbCreate: dbCreate,
+                  insecure: insecure,
+                  noblob: noblob,
+                  isReadonlyConnection: isReadonlyConnection,
+                  maxData: maxData,
+                  maxRows: maxRows,
+                  maxRowset: maxRowset,
+                  dbname: dbname,
+                  rootCertificate: rootCertificate,
+                  clientCertificate: clientCertificate,
+                  clientCertificateKey: clientCertificateKey)
+    }
+
+    public init(hostname: String,
                 username: String,
                 password: String,
+                port: Port = .default,
+                family: Family = .ipv4,
+                passwordHashed: Bool = false,
+                nonlinearizable: Bool = false,
+                timeout: Int = 0,
+                compression: Bool = false,
+                zerotext: Bool = false,
+                memory: Bool = false,
+                dbCreate: Bool = false,
+                insecure: Bool = false,
+                noblob: Bool = false,
+                isReadonlyConnection: Bool = false,
+                maxData: Int = 0,
+                maxRows: Int = 0,
+                maxRowset: Int = 0,
+                dbname: String? = nil,
+                rootCertificate: String? = nil,
+                clientCertificate: String? = nil,
+                clientCertificateKey: String? = nil) {
+        self.init(hostname: hostname,
+                  username: username,
+                  password: password,
+                  apiKey: nil,
+                  port: port,
+                  family: family,
+                  passwordHashed: passwordHashed,
+                  nonlinearizable: nonlinearizable,
+                  timeout: timeout,
+                  compression: compression,
+                  zerotext: zerotext,
+                  memory: memory,
+                  dbCreate: dbCreate,
+                  insecure: insecure,
+                  noblob: noblob,
+                  isReadonlyConnection: isReadonlyConnection,
+                  maxData: maxData,
+                  maxRows: maxRows,
+                  maxRowset: maxRowset,
+                  dbname: dbname,
+                  rootCertificate: rootCertificate,
+                  clientCertificate: clientCertificate,
+                  clientCertificateKey: clientCertificateKey)
+    }
+
+    private init(hostname: String,
+                username: String?,
+                password: String?,
+                 apiKey: String?,
                 port: Port = .default,
                 family: Family = .ipv4,
                 passwordHashed: Bool = false,
@@ -75,6 +170,7 @@ public struct SQLiteCloudConfig: Sendable {
         self.port = port
         self.username = username
         self.password = password
+        self.apiKey = apiKey
         self.family = family
         self.passwordHashed = passwordHashed
         self.nonlinearizable = nonlinearizable
@@ -94,7 +190,7 @@ public struct SQLiteCloudConfig: Sendable {
         self.clientCertificate = clientCertificate
         self.clientCertificateKey = clientCertificateKey
     }
-    
+
     public init?(connectionString: String) {
         guard let url = URL(string: connectionString) else { return nil }
         
@@ -103,22 +199,38 @@ public struct SQLiteCloudConfig: Sendable {
     
     /// sqlitecloud://user:pass@host.com:port/dbname?timeout=10&key2=value2&key3=value3.
     public init?(connectionURL: URL) {
-        guard let username = connectionURL.user else { return nil }
-        guard let password = connectionURL.password else { return nil }
         guard let hostname = connectionURL.host else { return nil }
-        let port = connectionURL.port.map { Port.custom(portNumber: $0) } ?? .default
-        
+
         let urlComponents = URLComponents(string: connectionURL.absoluteString)
         let queryItems = urlComponents?.queryItems
-        
+
+        // There are 2 kind of possibile credentials types
+        // - based on an apikey
+        // - based on the username and the password combo
+        // We need to search for this credential info in the connection string.
+        // First we check for apikey, if fails we fallback on the user/pass combo.
+
+        if let apiKey = UrlParser.parse(items: queryItems, name: "apikey") {
+            self.username = nil
+            self.password = nil
+            self.apiKey = apiKey
+        } else {
+            guard let username = connectionURL.user else { return nil }
+            guard let password = connectionURL.password else { return nil }
+
+            self.username = username
+            self.password = password
+            self.apiKey = nil
+        }
+
+        let port = connectionURL.port.map { Port.custom(portNumber: $0) } ?? .default
+
         // external
         self.hostname = hostname
         self.port = port
         self.isReadonlyConnection = UrlParser.parse(items: queryItems, name: "readonly")
         
         // in config
-        self.username = username
-        self.password = password
         self.dbname = urlComponents?.path.replacingOccurrences(of: "/", with: "")
         self.family = Family(rawValue: UrlParser.parse(items: queryItems, name: "family")) ?? .ipv4
         self.passwordHashed = UrlParser.parse(items: queryItems, name: "passwordHashed")
@@ -143,7 +255,11 @@ public struct SQLiteCloudConfig: Sendable {
 
 extension SQLiteCloudConfig {
     var connectionString: String {
-        "sqlitecloud://\(username):****@\(hostname):\(port.number)/\(dbname ?? .empty)"
+        if let apiKey {
+            "sqlitecloud://\(hostname):\(port.number)/\(dbname ?? .empty)?apikey=\(apiKey)"
+        } else {
+            "sqlitecloud://\(username ?? ""):****@\(hostname):\(port.number)/\(dbname ?? .empty)"
+        }
     }
 }
 

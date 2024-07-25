@@ -29,6 +29,7 @@ struct Secrets: Decodable {
     let hostname: String
     let username: String
     let password: String
+    let apiKey: String
 }
 
 extension Secrets {

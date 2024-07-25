@@ -30,12 +30,14 @@ final class SQLiteCloudTests_Connection: XCTestCase {
     private var hostname: String = .empty
     private var username: String = .empty
     private var password: String = .empty
+    private var apiKey: String = .empty
 
     override func setUpWithError() throws {
         let secrets = try Secrets.load()
         hostname = secrets.hostname
         username = secrets.username
         password = secrets.password
+        apiKey = secrets.apiKey
     }
 
     func test_connect_withValidCredentials_shouldConnectWithoutError() async throws {
@@ -48,7 +50,18 @@ final class SQLiteCloudTests_Connection: XCTestCase {
             XCTFail("An error was thrown: \(error)")
         }
     }
-    
+
+    func test_connect_withValidCredentialAPIKey_shouldConnectWithoutError() async throws {
+        let config = SQLiteCloudConfig(hostname: hostname, apiKey: apiKey)
+        let cloud = SQLiteCloud(config: config)
+
+        do {
+            try await cloud.connect()
+        } catch {
+            XCTFail("An error was thrown: \(error)")
+        }
+    }
+
     func test_connect_withInvalidCredentials_shouldThrowError() async throws {
         let config = SQLiteCloudConfig(hostname: hostname, username: "!!invalid!!", password: "!!credentials!!")
         let cloud = SQLiteCloud(config: config)
@@ -60,7 +73,19 @@ final class SQLiteCloudTests_Connection: XCTestCase {
             XCTAssert(error is SQLiteCloudError)
         }
     }
-    
+
+    func test_connect_withInvalidCredentialAPIKey_shouldThrowError() async throws {
+        let config = SQLiteCloudConfig(hostname: hostname, apiKey: "!!invalid!!")
+        let cloud = SQLiteCloud(config: config)
+
+        do {
+            try await cloud.connect()
+            XCTFail("No errors were thrown.")
+        } catch {
+            XCTAssert(error is SQLiteCloudError)
+        }
+    }
+
     func test_disconnect_withValidConnection_shouldDisconnectWithoutError() async throws {
         let config = SQLiteCloudConfig(hostname: hostname, username: username, password: password)
         let cloud = SQLiteCloud(config: config)
